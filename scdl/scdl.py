@@ -441,7 +441,7 @@ def get_filename(track, original_filename=None):
 
     if arguments['--addurl']:
         permalink_path = urlparse(track['permalink_url']).path.replace('/', '#')
-        title = 'URL' + permalink_path + '_' + title
+        title = '#URL' + permalink_path + '#URL#' + title
 
     if arguments['--addtimestamp']:
         # created_at sample: 2019-01-30T11:11:37Z
