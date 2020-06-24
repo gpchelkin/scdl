@@ -4,11 +4,11 @@
 """scdl allows you to download music from Soundcloud
 
 Usage:
-    scdl -l <track_url> [-a | -f | -C | -t | -p][-c | --force-metadata][-n <maxtracks>]\
+    scdl -l <track_url> [-a | -f | -C | -t | -p | -r][-c | --force-metadata][-n <maxtracks>]\
 [-o <offset>][--hidewarnings][--debug | --error][--path <path>][--addtofile][--addtimestamp]
 [--addurl][--onlymp3][--hide-progress][--min-size <size>][--max-size <size>][--remove][--no-album-tag]
 [--no-playlist-folder][--download-archive <file>][--extract-artist][--flac]
-    scdl me (-s | -a | -f | -t | -p | -m)[-c | --force-metadata][-n <maxtracks>]\
+    scdl me (-s | -a | -f | -t | -p | -m | -r)[-c | --force-metadata][-n <maxtracks>]\
 [-o <offset>][--hidewarnings][--debug | --error][--path <path>][--addtofile][--addtimestamp]
 [--addurl][--onlymp3][--hide-progress][--min-size <size>][--max-size <size>][--remove]
 [--no-playlist-folder][--download-archive <file>][--extract-artist][--flac][--no-album-tag]
@@ -24,6 +24,7 @@ Options:
     -n [maxtracks]              Download the n last tracks of a playlist according to the creation date
     -s                          Download the stream of a user (token needed)
     -a                          Download all tracks of user (including reposts)
+    -r                          Download all reposts of user
     -t                          Download all uploads of a user (no reposts)
     -f                          Download all favorites of a user
     -C                          Download all commented by a user
@@ -101,6 +102,8 @@ url = {
     'tracks': ('https://api-v2.soundcloud.com/users/{0}/tracks?'
                'limit=200'),
     'all': ('https://api-v2.soundcloud.com/profile/soundcloud:users:{0}?'
+            'limit=200'),
+    'reposts': ('https://api-v2.soundcloud.com/profile/soundcloud:users:{0}?'
             'limit=200'),
     'playlists': ('https://api-v2.soundcloud.com/users/{0}/playlists?'
                   'limit=5'),
@@ -289,6 +292,8 @@ def parse_url(track_url):
             download(item, 'tracks', 'uploaded tracks')
         elif arguments['-a']:
             download(item, 'all', 'tracks and reposts')
+        elif arguments['-r']:
+            download(item, 'reposts', 'reposts')
         elif arguments['-p']:
             download(item, 'playlists', 'playlists')
         elif arguments['-m']:
@@ -365,6 +370,9 @@ def download(user, dl_type, name):
                 item_name = item['type'].split('-')[0]  # remove the '-repost'
                 uri = item[item_name]['uri']
                 parse_url(uri)
+            if dl_type == 'reposts':
+                if item['type'] == 'track-repost':
+                    parse_url(item['track']['uri'])
             elif dl_type == 'playlists':
                 download_playlist(item)
             elif dl_type == 'playlists-liked':
