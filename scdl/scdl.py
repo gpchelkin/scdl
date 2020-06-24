@@ -6,11 +6,11 @@
 Usage:
     scdl -l <track_url> [-a | -f | -C | -t | -p][-c | --force-metadata][-n <maxtracks>]\
 [-o <offset>][--hidewarnings][--debug | --error][--path <path>][--addtofile][--addtimestamp]
-[--onlymp3][--hide-progress][--min-size <size>][--max-size <size>][--remove][--no-album-tag]
+[--addurl][--onlymp3][--hide-progress][--min-size <size>][--max-size <size>][--remove][--no-album-tag]
 [--no-playlist-folder][--download-archive <file>][--extract-artist][--flac]
     scdl me (-s | -a | -f | -t | -p | -m)[-c | --force-metadata][-n <maxtracks>]\
 [-o <offset>][--hidewarnings][--debug | --error][--path <path>][--addtofile][--addtimestamp]
-[--onlymp3][--hide-progress][--min-size <size>][--max-size <size>][--remove]
+[--addurl][--onlymp3][--hide-progress][--min-size <size>][--max-size <size>][--remove]
 [--no-playlist-folder][--download-archive <file>][--extract-artist][--flac][--no-album-tag]
     scdl -h | --help
     scdl --version
@@ -35,6 +35,7 @@ Options:
     --addtimestamp              Add track creation timestamp to filename,
                                 which allows for chronological sorting
     --addtofile                 Add artist to filename if missing
+    --addurl                    Add source permalink URL path (with # instead of /) to filename
     --debug                     Set log level to DEBUG
     --download-archive [file]   Keep track of track IDs in an archive file,
                                 and skip already-downloaded files
@@ -78,6 +79,7 @@ from scdl import client, utils
 
 from datetime import datetime
 import subprocess
+from urllib.parse import urlparse
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logging.getLogger('requests').setLevel(logging.WARNING)
@@ -436,6 +438,10 @@ def get_filename(track, original_filename=None):
         if username not in title and '-' not in title:
             title = '{0} - {1}'.format(username, title)
             logger.debug('Adding "{0}" to filename'.format(username))
+
+    if arguments['--addurl']:
+        permalink_path = urlparse(track['permalink_url']).path.replace('/', '#')
+        title = 'URL' + permalink_path + '_' + title
 
     if arguments['--addtimestamp']:
         # created_at sample: 2019-01-30T11:11:37Z

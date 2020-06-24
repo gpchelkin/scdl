@@ -51,6 +51,7 @@ scdl me -f
     -o [offset]                 Begin with a custom offset
     --addtimestamp              Add track creation timestamp to filename, which allows for chronological sorting
     --addtofile                 Add artist to filename if missing
+    --addurl                    Add source permalink URL path (with # instead of /) to filename
     --debug                     Set log level to DEBUG
     --download-archive [file]   Keep track of track IDs in an archive file, and skip already-downloaded files
     --error                     Set log level to ERROR
